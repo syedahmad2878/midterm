@@ -1,0 +1,9 @@
+2024-07-01 23:55:32,708 - INFO - Logging configured.
+2024-07-01 23:55:32,715 - INFO - Command 'add' from plugin 'add' registered.
+2024-07-01 23:55:32,717 - INFO - Command 'divide' from plugin 'divide' registered.
+2024-07-01 23:55:32,718 - INFO - Command 'env' from plugin 'env' registered.
+2024-07-01 23:55:32,720 - INFO - Command 'multiply' from plugin 'multiply' registered.
+2024-07-01 23:55:32,722 - INFO - Command 'subtract' from plugin 'subtract' registered.
+2024-07-01 23:55:32,722 - INFO - Application started. Type 'exit' to exit.
+2024-07-01 23:55:49,266 - INFO - Application exit.
+2024-07-01 23:55:49,266 - INFO - Application shutdown.
