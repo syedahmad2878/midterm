@@ -9,3 +9,5 @@ class divideCommand(Command):
             print(f"The result is: {c}")
         except ValueError:
             print("Invalid input. Please enter numeric values.")
+        except ZeroDivisionError:
+            print("Error: Division by zero is not allowed.")

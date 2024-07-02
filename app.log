@@ -7,3 +7,11 @@
 2024-07-01 23:55:32,722 - INFO - Application started. Type 'exit' to exit.
 2024-07-01 23:55:49,266 - INFO - Application exit.
 2024-07-01 23:55:49,266 - INFO - Application shutdown.
+2024-07-02 00:21:15,309 - INFO - Logging configured.
+2024-07-02 00:21:15,313 - INFO - Command 'add' from plugin 'add' registered.
+2024-07-02 00:21:15,314 - INFO - Command 'divide' from plugin 'divide' registered.
+2024-07-02 00:21:15,315 - INFO - Command 'env' from plugin 'env' registered.
+2024-07-02 00:21:15,315 - INFO - Command 'multiply' from plugin 'multiply' registered.
+2024-07-02 00:21:15,316 - INFO - Command 'subtract' from plugin 'subtract' registered.
+2024-07-02 00:21:15,316 - INFO - Application started. Type 'exit' to exit.
+2024-07-02 00:21:50,715 - INFO - Application shutdown.
