@@ -1,4 +1,3 @@
-
 #from calc_app.commands.command_handler import CommandHandler
 #from calc_app.commands.add import addCommand
 #from calc_app import commands, Command, CommandHandler, addCommand, subCommand, multiCommand, divideCommand, exitCommand, greetCommand, goodbyeCommand, menuCommand, readEnviornment
@@ -18,12 +17,15 @@ import sys
 
 #if __name__ == "__main__":
  #   main()
+global app_instance
 class App:
     def __init__(self):
         self.command_handler = CommandHandler()
         self.configure_logging()
+        self.commands_list = []
         #self.settings = self.load_environment_variables()
        # print(self.settings['ENVIRONMENT'])
+        self.register_menu_command()
         self.start()
         
     def configure_logging(self):
@@ -37,6 +39,7 @@ class App:
     
    
     def load_plugins(self):
+        
         plugins_package = 'calc_app.plugins'
         plugins_path = plugins_package.replace('.', '/')
         
@@ -61,14 +64,31 @@ class App:
             item = getattr(plugin_module, item_name)
             if isinstance(item, type) and issubclass(item, Command) and item is not Command:
                 # Command names are now explicitly set to the plugin's folder name
-                self.command_handler.register_command(plugin_name, item())
-                
-                logging.info(f"Command '{plugin_name}' from plugin '{plugin_name}' registered.")
+                if plugin_name != "menu":
+                    self.command_handler.register_command(plugin_name, item())               
+                    self.commands_list.append(plugin_name)
+                    logging.info(f"Command '{plugin_name}' from plugin '{plugin_name}' registered.")
 
+    def get_commands_list(self):
+        return self.commands_list
+    def register_menu_command(self):
+        from calc_app.plugins.menu import menuCommand
+        menu_command_instance = menuCommand(self)  # Pass the App instance here
+        self.command_handler.register_command('menu', menu_command_instance)
+        self.commands_list.append('menu')
+    logging.info("Menu command registered.")
+
+    def register_menu_command(self):
+        from calc_app.plugins.menu import menuCommand
+        menu_command = menuCommand(self)
+        self.command_handler.register_command('menu', menu_command)
+        self.commands_list.append('menu')
+        logging.info("Menu command registered.")
 
     def start(self):
        
         self.load_plugins()
+        
         logging.info("Application started. Type 'exit' to exit.")
         try:
             while True:
@@ -88,4 +108,6 @@ class App:
             logging.info("Application shutdown.")
 
 if __name__ == "__main__":
-    App()
+    app_instance = App()
+    app_instance.start()
+    #App()

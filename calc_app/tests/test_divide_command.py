@@ -1,59 +1,66 @@
 import pytest
+from unittest.mock import patch, MagicMock
 from calc_app.plugins.divide import divideCommand
-from io import StringIO
-import sys
 
-class MockInput:
-    def __init__(self, inputs):
-        self.inputs = inputs
-        self.index = 0
+# Mock class to simulate the Command base class if needed
+class MockCommand:
+    def get_env_variable(self, var):
+        if var == "DECIMAL_PLACES":
+            return "2"
+        elif var == "SAVE_HISTORY":
+            return "True"
+    
+    def record_history(self, operation, a, b, result):
+        pass
 
-    def __call__(self, _):
-        input_value = self.inputs[self.index]
-        self.index += 1
-        return input_value
+class TestDivideCommand(MockCommand, divideCommand):
+    pass
 
-def test_divide_command_valid_input(monkeypatch):
-    # Arrange
-    inputs = ['10', '2']
-    monkeypatch.setattr('builtins.input', MockInput(inputs))
-    command = divideCommand()
-    captured_output = StringIO()
-    sys.stdout = captured_output
+@pytest.fixture
+def divide_command():
+    return TestDivideCommand()
 
-    # Act
-    command.execute()
+def test_execute_success(divide_command):
+    with patch('builtins.input', side_effect=["10", "2"]), \
+         patch.object(divide_command, 'get_env_variable', side_effect=["2", "True"]), \
+         patch.object(divide_command, 'record_history') as mock_record_history:
 
-    # Assert
-    sys.stdout = sys.__stdout__
-    assert "The result is: 5.0" in captured_output.getvalue()
+        divide_command.execute()
+        
+        mock_record_history.assert_called_once_with("divide", "10", "2", 5.0)
 
-def test_divide_command_invalid_input(monkeypatch):
-    # Arrange
-    inputs = ['10', 'abc']
-    monkeypatch.setattr('builtins.input', MockInput(inputs))
-    command = divideCommand()
-    captured_output = StringIO()
-    sys.stdout = captured_output
+def test_execute_invalid_input(divide_command, capsys):
+    with patch('builtins.input', side_effect=["ten", "2"]), \
+         patch.object(divide_command, 'get_env_variable', side_effect=["2", "True"]):
 
-    # Act
-    command.execute()
+        divide_command.execute()
+        
+        captured = capsys.readouterr()
+        assert "Invalid input. Please enter numeric values." in captured.out
 
-    # Assert
-    sys.stdout = sys.__stdout__
-    assert "Invalid input. Please enter numeric values." in captured_output.getvalue()
+def test_execute_no_history(divide_command):
+    with patch('builtins.input', side_effect=["10", "2"]), \
+         patch.object(divide_command, 'get_env_variable', side_effect=["2", "False"]), \
+         patch.object(divide_command, 'record_history') as mock_record_history:
 
-def test_divide_command_division_by_zero(monkeypatch):
-    # Arrange
-    inputs = ['10', '0']
-    monkeypatch.setattr('builtins.input', MockInput(inputs))
-    command = divideCommand()
-    captured_output = StringIO()
-    sys.stdout = captured_output
+        divide_command.execute()
+        
+        mock_record_history.assert_not_called()
 
-    # Act
-    command.execute()
+def test_execute_invalid_decimal_places(divide_command, capsys):
+    with patch('builtins.input', side_effect=["8", "2"]), \
+         patch.object(divide_command, 'get_env_variable', side_effect=["invalid", "True"]):
 
-    # Assert
-    sys.stdout = sys.__stdout__
-    assert "Error: Division by zero is not allowed." in captured_output.getvalue()
+        divide_command.execute()
+        
+        captured = capsys.readouterr()
+        assert "Invalid input. Please enter numeric values." in captured.out
+
+def test_execute_zero_division(divide_command, capsys):
+    with patch('builtins.input', side_effect=["8", "0"]), \
+         patch.object(divide_command, 'get_env_variable', side_effect=["2", "True"]):
+
+        divide_command.execute()
+        
+        captured = capsys.readouterr()
+        assert "Error: Division by zero is not allowed." in captured.out
